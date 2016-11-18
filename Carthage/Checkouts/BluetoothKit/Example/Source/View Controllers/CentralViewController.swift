@@ -169,7 +169,9 @@ internal class CentralViewController: UIViewController, UITableViewDataSource, U
 
     internal func central(_ central: BKCentral, remotePeripheralDidDisconnect remotePeripheral: BKRemotePeripheral) {
         Logger.log("Remote peripheral did disconnect: \(remotePeripheral)")
-        self.navigationController?.popToViewController(self, animated: true)
+        if let navController = self.navigationController {
+            navController.popToViewController(self, animated: true)
+        }
     }
 
     // MARK: RemotePeripheralViewControllerDelegate
