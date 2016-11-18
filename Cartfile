@@ -1,0 +1,4 @@
+github "rhummelmose/BluetoothKit" "master"
+github "SnapKit/SnapKit" >= 3.0.0
+github "krzyzanowskim/CryptoSwift"
+
