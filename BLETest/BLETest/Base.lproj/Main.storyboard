@@ -105,11 +105,11 @@
                                         <rect key="frame" x="0.0" y="207" width="343" height="389.5"/>
                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                         <prototypes>
-                                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" id="l4M-fB-euc">
+                                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="SolClients" id="l4M-fB-euc">
                                                 <rect key="frame" x="0.0" y="28" width="343" height="44"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="l4M-fB-euc" id="zvp-HK-5yc">
-                                                    <rect key="frame" x="0.0" y="0.0" width="343" height="43"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="343" height="44"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <subviews>
                                                         <stackView opaque="NO" contentMode="scaleToFill" fixedFrame="YES" distribution="equalCentering" translatesAutoresizingMaskIntoConstraints="NO" id="4cw-cN-xMm">
@@ -170,6 +170,7 @@
                         <outlet property="deviceName" destination="jFi-6p-Hu8" id="qiz-bn-dTN"/>
                         <outlet property="energyProduced" destination="ioR-2w-ngf" id="aVb-5y-A7G"/>
                         <outlet property="energyProducedSlider" destination="brB-cz-Bqg" id="POH-jt-wkC"/>
+                        <outlet property="itemsTableView" destination="fnj-Ny-epQ" id="Oie-w0-mBA"/>
                         <outlet property="status" destination="riM-9X-AV8" id="5nR-k5-pVV"/>
                         <outlet property="totalEnergy" destination="V1q-yj-dUv" id="LwM-YQ-i74"/>
                     </connections>

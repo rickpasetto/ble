@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2B0D99791DDFB4460008F57C /* BluetoothKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2B7180881DDFB41600569235 /* BluetoothKit.framework */; };
+		2B0D997A1DDFB4500008F57C /* BluetoothKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 2B7180881DDFB41600569235 /* BluetoothKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		2B0D997C1DDFB7790008F57C /* DataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B0D997B1DDFB7790008F57C /* DataModel.swift */; };
+		2B0D997E1DDFBDBC0008F57C /* JSONConversion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B0D997D1DDFBDBC0008F57C /* JSONConversion.swift */; };
 		2B269B681DDE2F40004CD67C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B269B671DDE2F40004CD67C /* AppDelegate.swift */; };
 		2B269B6A1DDE2F40004CD67C /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B269B691DDE2F40004CD67C /* ViewController.swift */; };
 		2B269B6D1DDE2F40004CD67C /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2B269B6B1DDE2F40004CD67C /* Main.storyboard */; };
@@ -31,9 +35,46 @@
 			remoteGlobalIDString = 2B269B631DDE2F40004CD67C;
 			remoteInfo = BLETest;
 		};
+		2B7180871DDFB41600569235 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 2B7180811DDFB41600569235 /* BluetoothKit.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = C687E3981B8B496400B702D8;
+			remoteInfo = "BluetoothKit iOS";
+		};
+		2B7180891DDFB41600569235 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 2B7180811DDFB41600569235 /* BluetoothKit.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = C6ED86C11BA955A600C9B70B;
+			remoteInfo = "BluetoothKit OSX";
+		};
+		2B71808B1DDFB41600569235 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 2B7180811DDFB41600569235 /* BluetoothKit.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = C64CDDF31BE4C46A00F72549;
+			remoteInfo = "BluetoothKit tvOS";
+		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		2BAF04101DDF844C00749C28 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				2B0D997A1DDFB4500008F57C /* BluetoothKit.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		2B0D997B1DDFB7790008F57C /* DataModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataModel.swift; sourceTree = "<group>"; };
+		2B0D997D1DDFBDBC0008F57C /* JSONConversion.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSONConversion.swift; sourceTree = "<group>"; };
 		2B269B641DDE2F40004CD67C /* BLETest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BLETest.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2B269B671DDE2F40004CD67C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		2B269B691DDE2F40004CD67C /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -47,6 +88,7 @@
 		2B269B831DDE2F40004CD67C /* BLETestUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BLETestUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		2B269B871DDE2F40004CD67C /* BLETestUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLETestUITests.swift; sourceTree = "<group>"; };
 		2B269B891DDE2F40004CD67C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		2B7180811DDFB41600569235 /* BluetoothKit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = BluetoothKit.xcodeproj; path = ../Carthage/Checkouts/BluetoothKit/BluetoothKit.xcodeproj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -54,6 +96,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2B0D99791DDFB4460008F57C /* BluetoothKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -104,6 +147,8 @@
 				2B269B6E1DDE2F40004CD67C /* Assets.xcassets */,
 				2B269B701DDE2F40004CD67C /* LaunchScreen.storyboard */,
 				2B269B731DDE2F40004CD67C /* Info.plist */,
+				2B0D997B1DDFB7790008F57C /* DataModel.swift */,
+				2B0D997D1DDFBDBC0008F57C /* JSONConversion.swift */,
 			);
 			path = BLETest;
 			sourceTree = "<group>";
@@ -129,8 +174,19 @@
 		2B269B951DDE2FB2004CD67C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				2B7180811DDFB41600569235 /* BluetoothKit.xcodeproj */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		2B7180821DDFB41600569235 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				2B7180881DDFB41600569235 /* BluetoothKit.framework */,
+				2B71808A1DDFB41600569235 /* BluetoothKit.framework */,
+				2B71808C1DDFB41600569235 /* BluetoothKit.framework */,
+			);
+			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -143,6 +199,7 @@
 				2B269B601DDE2F40004CD67C /* Sources */,
 				2B269B611DDE2F40004CD67C /* Frameworks */,
 				2B269B621DDE2F40004CD67C /* Resources */,
+				2BAF04101DDF844C00749C28 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -201,6 +258,7 @@
 				TargetAttributes = {
 					2B269B631DDE2F40004CD67C = {
 						CreatedOnToolsVersion = 7.3.1;
+						DevelopmentTeam = BJBB97889J;
 						LastSwiftMigration = 0810;
 					};
 					2B269B771DDE2F40004CD67C = {
@@ -226,6 +284,12 @@
 			mainGroup = 2B269B5B1DDE2F40004CD67C;
 			productRefGroup = 2B269B651DDE2F40004CD67C /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 2B7180821DDFB41600569235 /* Products */;
+					ProjectRef = 2B7180811DDFB41600569235 /* BluetoothKit.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				2B269B631DDE2F40004CD67C /* BLETest */,
@@ -234,6 +298,30 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		2B7180881DDFB41600569235 /* BluetoothKit.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = BluetoothKit.framework;
+			remoteRef = 2B7180871DDFB41600569235 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		2B71808A1DDFB41600569235 /* BluetoothKit.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = BluetoothKit.framework;
+			remoteRef = 2B7180891DDFB41600569235 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		2B71808C1DDFB41600569235 /* BluetoothKit.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = BluetoothKit.framework;
+			remoteRef = 2B71808B1DDFB41600569235 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		2B269B621DDE2F40004CD67C /* Resources */ = {
@@ -269,6 +357,8 @@
 			files = (
 				2B269B6A1DDE2F40004CD67C /* ViewController.swift in Sources */,
 				2B269B681DDE2F40004CD67C /* AppDelegate.swift in Sources */,
+				2B0D997C1DDFB7790008F57C /* DataModel.swift in Sources */,
+				2B0D997E1DDFBDBC0008F57C /* JSONConversion.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -348,6 +438,7 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				FRAMEWORK_SEARCH_PATHS = ../Carthage/Build/iOS/;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -396,6 +487,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FRAMEWORK_SEARCH_PATHS = ../Carthage/Build/iOS/;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -417,6 +509,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = BJBB97889J;
 				INFOPLIST_FILE = BLETest/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = org.rickpasetto.BLETest;
@@ -429,6 +522,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = BJBB97889J;
 				INFOPLIST_FILE = BLETest/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = org.rickpasetto.BLETest;

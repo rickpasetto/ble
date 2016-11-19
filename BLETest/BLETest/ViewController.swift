@@ -7,9 +7,10 @@
 //
 
 import UIKit
-//import BluetoothKit
+import BluetoothKit
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, BKCentralDelegate,
+BKRemotePeripheralDelegate, BKPeripheralDelegate, BKRemotePeerDelegate, BKAvailabilityObserver {
 
 
     @IBOutlet weak var deviceName: UITextField!
@@ -17,28 +18,29 @@ class ViewController: UIViewController {
     @IBOutlet weak var energyProduced: UILabel!
     @IBOutlet weak var energyProducedSlider: UISlider!
     @IBOutlet weak var totalEnergy: UILabel!
+    @IBOutlet weak var itemsTableView: UITableView!
 
     @IBAction func sliderValueChanged(_ sender: UISlider) {
-        energyProduced.text = "\(trunc(energyProducedSlider.value))"
+        let val = Double(trunc(energyProducedSlider.value))
+        energyProduced.text = "\(val)"
     }
+
+    let tableViewCellIdentifier = "SolClients"
+
+    fileprivate var timer: Timer?
+    fileprivate var peripheral: BKPeripheral? = BKPeripheral()
+    fileprivate let central = BKCentral()
+    fileprivate var discoveries = [BKDiscovery]()
+
+    fileprivate var model = DataModel()
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
+        itemsTableView.register(UITableViewCell.self, forCellReuseIdentifier: tableViewCellIdentifier)
+        itemsTableView.dataSource = self
+        itemsTableView.delegate = self
 
-//        let peripheral = BKPeripheral()
-//        peripheral.delegate = self
-//        do {
-//            let serviceUUID = UUID(uuidString: "6E6B5C64-FAF7-40AE-9C21-D4933AF45B23")!
-//            let characteristicUUID = UUID(uuidString: "477A2967-1FAB-4DC5-920A-DEE5DE685A3D")!
-//            let localName = "My Cool Peripheral"
-//            let configuration = BKPeripheralConfiguration(dataServiceUUID: serviceUUID, dataServiceCharacteristicUUID:  characteristicUUID, localName: localName)
-//            try peripheral.startWithConfiguration(configuration)
-//            // You are now ready for incoming connections
-//        } catch let error {
-//            // Handle error.
-//        }
-
+        startAsPeripheral()
     }
 
     override func didReceiveMemoryWarning() {
@@ -46,6 +48,249 @@ class ViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
 
+    internal func startAsPeripheral() {
+
+        do {
+            peripheral?.delegate = self
+            peripheral?.addAvailabilityObserver(self)
+            let serviceUUID = UUID(uuidString: "6E6B5C64-FAF7-40AE-9C21-D4933AF45B23")!
+            let characteristicUUID = UUID(uuidString: "477A2967-1FAB-4DC5-920A-DEE5DE685A3D")!
+            let localName = model.myId
+            let configuration = BKPeripheralConfiguration(dataServiceUUID: serviceUUID, dataServiceCharacteristicUUID:  characteristicUUID, localName: localName)
+            try peripheral?.startWithConfiguration(configuration)
+
+            print("Starting as Peripheral, Looking for a Central")
+
+            if #available(iOS 10.0, *) {
+                timer = Timer.scheduledTimer(withTimeInterval: TimeInterval(8), repeats: false, block: {_ in
+                    print("No Central found, switching to Central")
+                    self.switchToCentral()
+                })
+            } else {
+                // Fallback on earlier versions
+            }
+        } catch _ {
+            // Handle error.
+        }
+    }
+
+    internal func switchToCentral() {
+        let _ = try? peripheral?.stop()
+
+        peripheral?.delegate = nil
+        peripheral = nil
+
+        startAsCentral()
+    }
+
+    internal func startAsCentral() {
+        do {
+            central.delegate = self
+            central.addAvailabilityObserver(self)
+            let serviceUUID = UUID(uuidString: "6E6B5C64-FAF7-40AE-9C21-D4933AF45B23")!
+            let characteristicUUID = UUID(uuidString: "477A2967-1FAB-4DC5-920A-DEE5DE685A3D")!
+            let localName = model.myId
+            let configuration = BKPeripheralConfiguration(dataServiceUUID: serviceUUID, dataServiceCharacteristicUUID:  characteristicUUID, localName: localName)
+            try central.startWithConfiguration(configuration)
+
+            print("Starting as Central, Looking for a Peripheral")
+
+//            if #available(iOS 10.0, *) {
+//                timer = Timer.scheduledTimer(withTimeInterval: TimeInterval(10), repeats: false, block: {_ in
+//                    print("No Peripheral found, switching to Peripheral")
+//                    self.switchToPeripheral()
+//                })
+//            } else {
+//                // Fallback on earlier versions
+//            }
+
+        } catch _ {
+
+        }
+    }
+
+    internal func switchToPeripheral() {
+        let _ = try? central.stop()
+
+        startAsPeripheral()
+    }
+
+
+    fileprivate func scan() {
+        central.scanContinuouslyWithChangeHandler({ changes, discoveries in
+
+//            print("changes: \(changes), discoveries: \(discoveries)")
+//
+            for discovery in discoveries {
+                self.central.connect(remotePeripheral: discovery.remotePeripheral) { remotePeripheral, error in
+                    print("Connected to \(remotePeripheral.name)")
+                    self.timer?.invalidate()
+                    remotePeripheral.delegate = self
+                    remotePeripheral.peripheralDelegate = self
+                }
+            }
+            self.discoveries = discoveries
+//            let indexPathsToRemove = changes.filter({ $0 == .remove(discovery: nil) }).map({ IndexPath(row: self.discoveries.index(of: $0.discovery)!, section: 0) })
+//            let indexPathsToInsert = changes.filter({ $0 == .insert(discovery: nil) }).map({ IndexPath(row: self.discoveries.index(of: $0.discovery)!, section: 0) })
+//            if !indexPathsToRemove.isEmpty {
+//                self.itemsTableView.deleteRows(at: indexPathsToRemove, with: UITableViewRowAnimation.automatic)
+//            }
+//            if !indexPathsToInsert.isEmpty {
+//                self.itemsTableView.insertRows(at: indexPathsToInsert, with: UITableViewRowAnimation.automatic)
+//            }
+//            for insertedDiscovery in changes.filter({ $0 == .insert(discovery: nil) }) {
+//                print("Discovery: \(insertedDiscovery)")
+//            }
+
+        }, stateHandler: { newState in
+            if newState == .scanning {
+//                self.activityIndicator?.startAnimating()
+                return
+            } else if newState == .stopped {
+//                self.discoveries.removeAll()
+//                self.discoveriesTableView.reloadData()
+            }
+//            self.activityIndicator?.stopAnimating()
+        }, errorHandler: { error in
+//            print("Error from scanning: \(error)")
+        })
+    }
+
+    // MARK: BKPeripheralDelegate
+
+    internal func peripheral(_ peripheral: BKPeripheral, remoteCentralDidConnect remoteCentral: BKRemoteCentral) {
+        print("Remote central did connect: \(remoteCentral)")
+        timer?.invalidate()
+        remoteCentral.delegate = self
+
+
+        if let data = model.toJSON() {
+
+            peripheral.sendData(data, toRemotePeer: remoteCentral) { data, remoteCentral, error in
+                guard error == nil else {
+                    print("Failed sending to \(remoteCentral)")
+                    return
+                }
+                print("Sent \(String(data: data, encoding: .utf8)) to \(remoteCentral)")
+            }
+        }
+
+    }
+
+    internal func peripheral(_ peripheral: BKPeripheral, remoteCentralDidDisconnect remoteCentral: BKRemoteCentral) {
+        print("Remote central did disconnect: \(remoteCentral)")
+    }
+
+    // MARK: BKRemotePeerDelegate
+
+    func remotePeer(_ remotePeer: BKRemotePeer, didSendArbitraryData data: Data) {
+//        print("Received data of length: \(data.count) with hash: \(data.hashValue)")
+
+        print("Received data: \(String(data: data, encoding: .utf8))")
+
+        self.model.mergeWith(data: data)
+
+        self.itemsTableView.reloadData()
+    }
+
+    public func central(_ central: BKCentral, remotePeripheralDidConnect remotePeripheral: BKRemotePeripheral) {
+        print("Remote peripheral did connect: \(remotePeripheral)")
+    }
+
+    
+    public func central(_ central: BKCentral, remotePeripheralDidDisconnect remotePeripheral: BKRemotePeripheral) {
+
+        remotePeripheral.delegate = nil
+
+        broadcastUpdate()
+    }
+
+    private func broadcastUpdate() {
+        if let data = model.toJSON() {
+            for peripheral in central.connectedRemotePeripherals {
+
+                central.sendData(data, toRemotePeer: peripheral) { data, remotePeripheral, error in
+                    guard error == nil else {
+                        print("Failed sending to \(remotePeripheral)")
+                        return
+                    }
+                    print("Sent data: \(String(data: data, encoding: .utf8)) to \(remotePeripheral)")
+                }
+            }
+        }
+    }
+
+    /**
+     Informs the observer about a change in Bluetooth LE availability.
+     - parameter availabilityObservable: The object that registered the availability change.
+     - parameter availability: The new availability value.
+     */
+    public func availabilityObserver(_ availabilityObservable: BKAvailabilityObservable, availabilityDidChange availability: BKAvailability) {
+//        availabilityView.availabilityObserver(availabilityObservable, availabilityDidChange: availability)
+        if availability == .available {
+            scan()
+        } else {
+            central.interruptScan()
+        }
+    }
+
+    /**
+     Informs the observer that the cause of Bluetooth LE unavailability changed.
+     - parameter availabilityObservable: The object that registered the cause change.
+     - parameter unavailabilityCause: The new cause of unavailability.
+     */
+    public func availabilityObserver(_ availabilityObservable: BKAvailabilityObservable, unavailabilityCauseDidChange unavailabilityCause: BKUnavailabilityCause) {
+
+    }
+
+    // MARK: RemotePeripheralDelegate
+
+    public func remotePeripheral(_ remotePeripheral: BKRemotePeripheral, didUpdateName name: String) {
+
+    }
+    
+    /**
+     Called when services and charateristic are discovered and the device is ready for send/receive
+     - parameter remotePeripheral: The remote peripheral that is ready.
+     */
+    public func remotePeripheralIsReady(_ remotePeripheral: BKRemotePeripheral) {
+
+        print("Remote peripheral is ready: \(remotePeripheral)")
+        broadcastUpdate()
+
+    }
+
+
+    // MARK: UITableViewDataSource
+
+    internal func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+//        return discoveries.count
+
+        return model.count
+
+    }
+
+    internal func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: tableViewCellIdentifier, for: indexPath)
+//        let discovery = discoveries[indexPath.row]
+//
+//        cell.textLabel?.text = nameFromDiscovery(discovery)
+
+        cell.textLabel?.text = model[indexPath.row].name + ": " + model[indexPath.row].id
+
+        return cell
+    }
+
+//    internal func nameFromDiscovery(_ discovery: BKDiscovery) -> String? {
+//        if let name = discovery.localName {
+//
+//            if let item = try? JSONSerialization.jsonObject(with: name.data(using: .utf8)!, options: .allowFragments) as? [String: String] {
+//
+//                return item!["name"]
+//            }
+//        }
+//        return nil
+//    }
 
 }
 
