@@ -12,6 +12,8 @@ import BluetoothKit
 class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, BKCentralDelegate,
 BKRemotePeripheralDelegate, BKPeripheralDelegate, BKRemotePeerDelegate, BKAvailabilityObserver {
 
+    let TimeoutToCentral = 5 // secs
+    let TimeoutToPeripheral = 5 // secs
 
     @IBOutlet weak var deviceName: UITextField!
     @IBOutlet weak var status: UISwitch!
@@ -22,7 +24,23 @@ BKRemotePeripheralDelegate, BKPeripheralDelegate, BKRemotePeerDelegate, BKAvaila
 
     @IBAction func sliderValueChanged(_ sender: UISlider) {
         let val = Double(trunc(energyProducedSlider.value))
-        energyProduced.text = "\(val)"
+        let valStr = "\(val)"
+        energyProduced.text = valStr + " Watts"
+    }
+
+    @IBAction func sliderValueDone(_ sender: UISlider) {
+        let val = Double(trunc(energyProducedSlider.value))
+        let valStr = "\(val)"
+        model.changeMyEnergy(valStr)
+        sendUpdate()
+        self.updateTotal()
+    }
+
+    @IBAction func statusValueChanged(_ sender: Any) {
+
+        model.changeMyStatus(self.status!.isOn ? "1" : "0")
+        sendUpdate()
+
     }
 
     let tableViewCellIdentifier = "SolClients"
@@ -40,7 +58,17 @@ BKRemotePeripheralDelegate, BKPeripheralDelegate, BKRemotePeerDelegate, BKAvaila
         itemsTableView.dataSource = self
         itemsTableView.delegate = self
 
+        deviceName.text = model.me()["name"]
+        deviceName.addTarget(self, action: #selector(ViewController.nameFieldDidChange), for: UIControlEvents.editingDidEndOnExit)
+
+        self.updateTotal()
+
         startAsPeripheral()
+    }
+
+    @objc private func nameFieldDidChange() {
+        model.changeMyName(deviceName.text!)
+        sendUpdate()
     }
 
     override func didReceiveMemoryWarning() {
@@ -62,7 +90,7 @@ BKRemotePeripheralDelegate, BKPeripheralDelegate, BKRemotePeerDelegate, BKAvaila
             print("Starting as Peripheral, Looking for a Central")
 
             if #available(iOS 10.0, *) {
-                timer = Timer.scheduledTimer(withTimeInterval: TimeInterval(8), repeats: false, block: {_ in
+                timer = Timer.scheduledTimer(withTimeInterval: TimeInterval(TimeoutToCentral), repeats: false, block: {_ in
                     print("No Central found, switching to Central")
                     self.switchToCentral()
                 })
@@ -95,8 +123,10 @@ BKRemotePeripheralDelegate, BKPeripheralDelegate, BKRemotePeerDelegate, BKAvaila
 
             print("Starting as Central, Looking for a Peripheral")
 
+            deviceName.textColor = UIColor.blue
+
 //            if #available(iOS 10.0, *) {
-//                timer = Timer.scheduledTimer(withTimeInterval: TimeInterval(10), repeats: false, block: {_ in
+//                timer = Timer.scheduledTimer(withTimeInterval: TimeInterval(TimeoutToPeripheral), repeats: false, block: {_ in
 //                    print("No Peripheral found, switching to Peripheral")
 //                    self.switchToPeripheral()
 //                })
@@ -163,18 +193,19 @@ BKRemotePeripheralDelegate, BKPeripheralDelegate, BKRemotePeerDelegate, BKAvaila
         timer?.invalidate()
         remoteCentral.delegate = self
 
+//
+//        if let data = model.toJSON() {
+//
+//            peripheral.sendData(data, toRemotePeer: remoteCentral) { data, remoteCentral, error in
+//                guard error == nil else {
+//                    print("Failed sending to \(remoteCentral)")
+//                    return
+//                }
+//                print("Sent \(String(data: data, encoding: .utf8)) to \(remoteCentral)")
+//            }
+//        }
 
-        if let data = model.toJSON() {
-
-            peripheral.sendData(data, toRemotePeer: remoteCentral) { data, remoteCentral, error in
-                guard error == nil else {
-                    print("Failed sending to \(remoteCentral)")
-                    return
-                }
-                print("Sent \(String(data: data, encoding: .utf8)) to \(remoteCentral)")
-            }
-        }
-
+        sendUpdate()
     }
 
     internal func peripheral(_ peripheral: BKPeripheral, remoteCentralDidDisconnect remoteCentral: BKRemoteCentral) {
@@ -186,11 +217,21 @@ BKRemotePeripheralDelegate, BKPeripheralDelegate, BKRemotePeerDelegate, BKAvaila
     func remotePeer(_ remotePeer: BKRemotePeer, didSendArbitraryData data: Data) {
 //        print("Received data of length: \(data.count) with hash: \(data.hashValue)")
 
-        print("Received data: \(String(data: data, encoding: .utf8))")
+        print("Received data: " + debugDataStr(data))
 
         self.model.mergeWith(data: data)
 
         self.itemsTableView.reloadData()
+
+        self.updateTotal()
+
+        if isCentral() {
+            sendUpdate()
+        }
+    }
+
+    private func isCentral() -> Bool {
+        return peripheral == nil
     }
 
     public func central(_ central: BKCentral, remotePeripheralDidConnect remotePeripheral: BKRemotePeripheral) {
@@ -202,22 +243,36 @@ BKRemotePeripheralDelegate, BKPeripheralDelegate, BKRemotePeerDelegate, BKAvaila
 
         remotePeripheral.delegate = nil
 
-        broadcastUpdate()
+        sendUpdate()
     }
 
-    private func broadcastUpdate() {
-        if let data = model.toJSON() {
-            for peripheral in central.connectedRemotePeripherals {
+    private func sendUpdate() {
+        if let peripheral = peripheral {
+            broadcastUpdateTo(from: peripheral, to: peripheral.connectedRemoteCentrals)
+        } else {
+            broadcastUpdateTo(from: central, to: central.connectedRemotePeripherals)
+        }
+    }
 
-                central.sendData(data, toRemotePeer: peripheral) { data, remotePeripheral, error in
+    private func broadcastUpdateTo(from: BKPeer, to: [BKRemotePeer]) {
+        if let data = model.toJSON() {
+            for remote in to {
+
+                from.sendData(data, toRemotePeer: remote) { data, remote, error in
                     guard error == nil else {
-                        print("Failed sending to \(remotePeripheral)")
+                        print("Failed sending to \(remote)")
                         return
                     }
-                    print("Sent data: \(String(data: data, encoding: .utf8)) to \(remotePeripheral)")
+                    print("Sent data: \(self.debugDataStr(data)) to \(remote)")
                 }
             }
         }
+    }
+
+    private func debugDataStr(_ data: Data) -> String {
+//        return String(data: data, encoding: .utf8)
+
+        return "\(dataToArray(data)!)"
     }
 
     /**
@@ -256,7 +311,7 @@ BKRemotePeripheralDelegate, BKPeripheralDelegate, BKRemotePeerDelegate, BKAvaila
     public func remotePeripheralIsReady(_ remotePeripheral: BKRemotePeripheral) {
 
         print("Remote peripheral is ready: \(remotePeripheral)")
-        broadcastUpdate()
+        sendUpdate()
 
     }
 
@@ -273,24 +328,18 @@ BKRemotePeripheralDelegate, BKPeripheralDelegate, BKRemotePeerDelegate, BKAvaila
     internal func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: tableViewCellIdentifier, for: indexPath)
 //        let discovery = discoveries[indexPath.row]
-//
-//        cell.textLabel?.text = nameFromDiscovery(discovery)
 
-        cell.textLabel?.text = model[indexPath.row]["name"]! + ": " + model[indexPath.row]["id"]!
+        cell.textLabel?.text = model[indexPath.row]["name"]! +
+            ": " + model[indexPath.row]["status"]! +
+            ": " + model[indexPath.row]["energyProduced"]!
 
         return cell
     }
 
-//    internal func nameFromDiscovery(_ discovery: BKDiscovery) -> String? {
-//        if let name = discovery.localName {
-//
-//            if let item = try? JSONSerialization.jsonObject(with: name.data(using: .utf8)!, options: .allowFragments) as? [String: String] {
-//
-//                return item!["name"]
-//            }
-//        }
-//        return nil
-//    }
+    private func updateTotal() {
+
+        self.totalEnergy.text = "\(model.total) Watts"
+    }
 
 }
 

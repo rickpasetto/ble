@@ -85,7 +85,11 @@ class DataModel {
 
     init() {
         // Happy Birthday
-        self.add(["birthday": Date().asString(), "id": myId, "name": "SF", "status": "0", "energyProduced": "0.0"])
+        self.add(["birthday": Date().asString(),
+                  "id": myId,
+                  "name": "Flare-" + myId.substring(to: myId.index(myId.startIndex, offsetBy: 4)),
+                  "status": "1",
+                  "energyProduced": "0.0"])
     }
 
     private func asArray() -> [SolarFlare] {
@@ -98,6 +102,18 @@ class DataModel {
         return items[myId]!
     }
 
+    func changeMyName(_ name: String) {
+        items[myId]!["name"] = name
+    }
+
+    func changeMyEnergy(_ energy: String) {
+        items[myId]!["energyProduced"] = energy
+    }
+
+    func changeMyStatus(_ status: String) {
+        items[myId]!["status"] = status
+    }
+    
     func add(_ item: SolarFlare) {
         items[item["id"]!] = item
     }
@@ -117,6 +133,11 @@ class DataModel {
         }
     }
 
+    var total: Double {
+
+        return self.asArray().reduce( 0.0, { $0 + Double($1["energyProduced"]!)! } )
+    }
+
     var count: Int { return self.asArray().filter { $0["id"]! != myId }.count }
 
     subscript(index: Int) -> SolarFlare {
@@ -130,16 +151,19 @@ class DataModel {
     }
 
     func mergeWith(data: Data) {
-
-        if let json = try? JSONSerialization.jsonObject(with: data, options: [])  {
-            if let json = json as? [[String: Any]] {
-                for each in json {
-                    self.add(each)
-                }
-            } else if let json = json as? [String: Any] {
-                self.add(json)
+        if let json = dataToArray(data) {
+            for each in json {
+                self.add(each)
             }
         }
-
     }
+}
+
+func dataToArray(_ data: Data) -> [[String: Any]]? {
+    if let json = try? JSONSerialization.jsonObject(with: data, options: [])  {
+        if let json = json as? [[String: Any]] {
+            return json
+        }
+    }
+    return nil
 }
