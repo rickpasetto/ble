@@ -276,7 +276,7 @@ BKRemotePeripheralDelegate, BKPeripheralDelegate, BKRemotePeerDelegate, BKAvaila
 //
 //        cell.textLabel?.text = nameFromDiscovery(discovery)
 
-        cell.textLabel?.text = model[indexPath.row].name + ": " + model[indexPath.row].id
+        cell.textLabel?.text = model[indexPath.row]["name"]! + ": " + model[indexPath.row]["id"]!
 
         return cell
     }
