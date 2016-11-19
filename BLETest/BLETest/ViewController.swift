@@ -9,10 +9,11 @@
 import UIKit
 import BluetoothKit
 
-// TODO: Cell
-// TODO: Dropping peripherals
 // TODO: Dropping central
 // TODO: Make it prettier
+//     - bg colors
+//     - app icon
+//     - Title?
 
 class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, BKCentralDelegate,
 BKRemotePeripheralDelegate, BKPeripheralDelegate, BKRemotePeerDelegate, BKAvailabilityObserver {
@@ -89,7 +90,7 @@ BKRemotePeripheralDelegate, BKPeripheralDelegate, BKRemotePeerDelegate, BKAvaila
             let serviceUUID = UUID(uuidString: "6E6B5C64-FAF7-40AE-9C21-D4933AF45B23")!
             let characteristicUUID = UUID(uuidString: "477A2967-1FAB-4DC5-920A-DEE5DE685A3D")!
             let localName = model.myId
-            let configuration = BKPeripheralConfiguration(dataServiceUUID: serviceUUID, dataServiceCharacteristicUUID:  characteristicUUID, localName: localName)
+            let configuration = BKPeripheralConfiguration(dataServiceUUID: serviceUUID, dataServiceCharacteristicUUID: characteristicUUID, localName: localName)
             try peripheral?.startWithConfiguration(configuration)
 
             print("Starting as Peripheral, Looking for a Central")
@@ -158,13 +159,19 @@ BKRemotePeripheralDelegate, BKPeripheralDelegate, BKRemotePeerDelegate, BKAvaila
 //
             for discovery in discoveries {
                 self.central.connect(remotePeripheral: discovery.remotePeripheral) { remotePeripheral, error in
-                    print("Connected to \(remotePeripheral.name)")
+//                    print("Connected to \(remotePeripheral.name)")
                     self.timer?.invalidate()
                     remotePeripheral.delegate = self
                     remotePeripheral.peripheralDelegate = self
                 }
             }
             self.discoveries = discoveries
+
+//            for lost in changes.filter({ $0 == .remove(discovery: nil) }) {
+//                print("Lost \(lost.discovery.localName)!")
+//                self.model.remove( id: lost.discovery.remotePeripheral.identifier.uuidString )
+//            }
+
 //            let indexPathsToRemove = changes.filter({ $0 == .remove(discovery: nil) }).map({ IndexPath(row: self.discoveries.index(of: $0.discovery)!, section: 0) })
 //            let indexPathsToInsert = changes.filter({ $0 == .insert(discovery: nil) }).map({ IndexPath(row: self.discoveries.index(of: $0.discovery)!, section: 0) })
 //            if !indexPathsToRemove.isEmpty {
@@ -224,15 +231,23 @@ BKRemotePeripheralDelegate, BKPeripheralDelegate, BKRemotePeerDelegate, BKAvaila
 
         print("Received data: " + debugDataStr(data))
 
-        self.model.mergeWith(data: data)
+        self.model.mergeWith(data: data, clearFirst: !isCentral())
 
-        self.itemsTableView.reloadData()
+        let array = dataToArray(data)
+        let other = array?[0]
+        print("Peer: \(other): bluetoothId: \(remotePeer.identifier)")
+        self.model.associate(id: other!["id"]! as! Id, bluetoothId: remotePeer.identifier)
 
-        self.updateTotal()
+        self.updateUI()
 
         if isCentral() {
             sendUpdate()
         }
+    }
+
+    private func updateUI() {
+        self.itemsTableView.reloadData()
+        self.updateTotal()
     }
 
     private func isCentral() -> Bool {
@@ -248,6 +263,11 @@ BKRemotePeripheralDelegate, BKPeripheralDelegate, BKRemotePeerDelegate, BKAvaila
 
         remotePeripheral.delegate = nil
 
+        model.remove(id: remotePeripheral.identifier)
+
+        print("Remote \(remotePeripheral.name!) (\(remotePeripheral.identifier.uuidString)) disconnected: now have \(model.count) remotes")
+
+        self.updateUI()
         sendUpdate()
     }
 
@@ -317,9 +337,7 @@ BKRemotePeripheralDelegate, BKPeripheralDelegate, BKRemotePeerDelegate, BKAvaila
 
         print("Remote peripheral is ready: \(remotePeripheral)")
         sendUpdate()
-
     }
-
 
     // MARK: UITableViewDataSource
 

@@ -87,15 +87,23 @@ class DataModel {
         // Happy Birthday
         self.add(["birthday": Date().asString(),
                   "id": myId,
+                  "bluetoothId": "",
                   "name": "Flare-" + myId.substring(to: myId.index(myId.startIndex, offsetBy: 4)),
                   "status": "1",
                   "energyProduced": "0.0"])
     }
 
     private func asArray() -> [SolarFlare] {
-        return items
-            .sorted { $0.value["name"]! < $1.value["name"]!}
-            .map { $0.value }
+
+        var result: [SolarFlare] = []
+        result.append(me())
+        result.append(contentsOf: items
+                .filter { $0.key != myId }
+                .map { $0.value }
+                .sorted { $0["name"]! < $1["name"]! }
+        )
+
+        return result
     }
 
     func me() -> SolarFlare {
@@ -113,7 +121,11 @@ class DataModel {
     func changeMyStatus(_ status: String) {
         items[myId]!["status"] = status
     }
-    
+
+    func associate(id: Id, bluetoothId: UUID) {
+        items[id]?["bluetoothId"] = bluetoothId.uuidString
+    }
+
     func add(_ item: SolarFlare) {
         items[item["id"]!] = item
     }
@@ -127,9 +139,12 @@ class DataModel {
         self.add(dict)
     }
 
-    func remove(_ item: SolarFlare) {
-        if item["id"] != myId {
-            items.removeValue(forKey: item["id"]!)
+    func remove(id: UUID) {
+        for (key, value) in items {
+            if value["bluetoothId"] == id.uuidString {
+                items.removeValue(forKey: key)
+                return
+            }
         }
     }
 
@@ -150,7 +165,14 @@ class DataModel {
         return try? JSONSerialization.data(withJSONObject: self.asArray(), options: .prettyPrinted)
     }
 
-    func mergeWith(data: Data) {
+    func mergeWith(data: Data, clearFirst: Bool) {
+
+        if clearFirst {
+            let me = self.me()
+            items.removeAll()
+            self.add(me)
+        }
+
         if let json = dataToArray(data) {
             for each in json {
                 self.add(each)
