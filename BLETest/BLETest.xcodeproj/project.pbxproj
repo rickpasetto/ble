@@ -18,6 +18,7 @@
 		2B269B721DDE2F40004CD67C /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2B269B701DDE2F40004CD67C /* LaunchScreen.storyboard */; };
 		2B269B7D1DDE2F40004CD67C /* BLETestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B269B7C1DDE2F40004CD67C /* BLETestTests.swift */; };
 		2B269B881DDE2F40004CD67C /* BLETestUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B269B871DDE2F40004CD67C /* BLETestUITests.swift */; };
+		2BB97A061DE0F8460041AA35 /* FlareTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BB97A051DE0F8460041AA35 /* FlareTableViewCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -89,6 +90,7 @@
 		2B269B871DDE2F40004CD67C /* BLETestUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLETestUITests.swift; sourceTree = "<group>"; };
 		2B269B891DDE2F40004CD67C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2B7180811DDFB41600569235 /* BluetoothKit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = BluetoothKit.xcodeproj; path = ../Carthage/Checkouts/BluetoothKit/BluetoothKit.xcodeproj; sourceTree = "<group>"; };
+		2BB97A051DE0F8460041AA35 /* FlareTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlareTableViewCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -149,6 +151,7 @@
 				2B269B731DDE2F40004CD67C /* Info.plist */,
 				2B0D997B1DDFB7790008F57C /* DataModel.swift */,
 				2B0D997D1DDFBDBC0008F57C /* JSONConversion.swift */,
+				2BB97A051DE0F8460041AA35 /* FlareTableViewCell.swift */,
 			);
 			path = BLETest;
 			sourceTree = "<group>";
@@ -356,6 +359,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				2B269B6A1DDE2F40004CD67C /* ViewController.swift in Sources */,
+				2BB97A061DE0F8460041AA35 /* FlareTableViewCell.swift in Sources */,
 				2B269B681DDE2F40004CD67C /* AppDelegate.swift in Sources */,
 				2B0D997C1DDFB7790008F57C /* DataModel.swift in Sources */,
 				2B0D997E1DDFBDBC0008F57C /* JSONConversion.swift in Sources */,

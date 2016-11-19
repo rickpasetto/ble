@@ -9,6 +9,11 @@
 import UIKit
 import BluetoothKit
 
+// TODO: Cell
+// TODO: Dropping peripherals
+// TODO: Dropping central
+// TODO: Make it prettier
+
 class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, BKCentralDelegate,
 BKRemotePeripheralDelegate, BKPeripheralDelegate, BKRemotePeerDelegate, BKAvailabilityObserver {
 
@@ -54,9 +59,9 @@ BKRemotePeripheralDelegate, BKPeripheralDelegate, BKRemotePeerDelegate, BKAvaila
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        itemsTableView.register(UITableViewCell.self, forCellReuseIdentifier: tableViewCellIdentifier)
-        itemsTableView.dataSource = self
-        itemsTableView.delegate = self
+//        itemsTableView.register(FlareTableViewCell.self, forCellReuseIdentifier: tableViewCellIdentifier)
+//        itemsTableView.dataSource = self
+//        itemsTableView.delegate = self
 
         deviceName.text = model.me()["name"]
         deviceName.addTarget(self, action: #selector(ViewController.nameFieldDidChange), for: UIControlEvents.editingDidEndOnExit)
@@ -326,14 +331,20 @@ BKRemotePeripheralDelegate, BKPeripheralDelegate, BKRemotePeerDelegate, BKAvaila
     }
 
     internal func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: tableViewCellIdentifier, for: indexPath)
+        let baseCell = tableView.dequeueReusableCell(withIdentifier: tableViewCellIdentifier, for: indexPath)
+
+        if let cell = baseCell as? FlareTableViewCell {
+            cell.updateWith(flare: model[indexPath.row])
+            return cell
+        }
+        else {
 //        let discovery = discoveries[indexPath.row]
 
-        cell.textLabel?.text = model[indexPath.row]["name"]! +
-            ": " + model[indexPath.row]["status"]! +
-            ": " + model[indexPath.row]["energyProduced"]!
-
-        return cell
+            baseCell.textLabel?.text = model[indexPath.row]["name"]! +
+                ": " + model[indexPath.row]["status"]! +
+                ": " + model[indexPath.row]["energyProduced"]!
+        }
+        return baseCell
     }
 
     private func updateTotal() {
