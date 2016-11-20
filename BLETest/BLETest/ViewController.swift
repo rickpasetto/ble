@@ -348,6 +348,10 @@ BKRemotePeripheralDelegate, BKPeripheralDelegate, BKRemotePeerDelegate, BKAvaila
 
     }
 
+    internal func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        return "Other Devices:"
+    }
+
     internal func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let baseCell = tableView.dequeueReusableCell(withIdentifier: tableViewCellIdentifier, for: indexPath)
 
