@@ -10,10 +10,6 @@ import UIKit
 import BluetoothKit
 
 // TODO: Dropping central
-// TODO: Make it prettier
-//     - bg colors
-//     - app icon
-//     - Title?
 
 class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, BKCentralDelegate,
 BKRemotePeripheralDelegate, BKPeripheralDelegate, BKRemotePeerDelegate, BKAvailabilityObserver {
@@ -222,6 +218,8 @@ BKRemotePeripheralDelegate, BKPeripheralDelegate, BKRemotePeerDelegate, BKAvaila
 
     internal func peripheral(_ peripheral: BKPeripheral, remoteCentralDidDisconnect remoteCentral: BKRemoteCentral) {
         print("Remote central did disconnect: \(remoteCentral)")
+
+        
     }
 
     // MARK: BKRemotePeerDelegate
@@ -233,15 +231,16 @@ BKRemotePeripheralDelegate, BKPeripheralDelegate, BKRemotePeerDelegate, BKAvaila
 
         self.model.mergeWith(data: data, clearFirst: !isCentral())
 
-        let array = dataToArray(data)
-        let other = array?[0]
-        print("Peer: \(other): bluetoothId: \(remotePeer.identifier)")
-        self.model.associate(id: other!["id"]! as! Id, bluetoothId: remotePeer.identifier)
+        if let array = dataToArray(data) {
+            let other = array[0]
+            print("Peer: \(other): bluetoothId: \(remotePeer.identifier)")
+            self.model.associate(id: other["id"]! as! Id, bluetoothId: remotePeer.identifier)
 
-        self.updateUI()
+            self.updateUI()
 
-        if isCentral() {
-            sendUpdate()
+            if isCentral() {
+                sendUpdate()
+            }
         }
     }
 
@@ -297,7 +296,7 @@ BKRemotePeripheralDelegate, BKPeripheralDelegate, BKRemotePeerDelegate, BKAvaila
     private func debugDataStr(_ data: Data) -> String {
 //        return String(data: data, encoding: .utf8)
 
-        return "\(dataToArray(data)!)"
+        return "\(dataToArray(data))"
     }
 
     /**

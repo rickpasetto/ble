@@ -106,7 +106,7 @@ class DataModel {
         result.append(contentsOf: items
                 .filter { $0.key != myId }
                 .map { $0.value }
-                .sorted { $0["name"]! < $1["name"]! }
+                .sorted { $0["name"]! > $1["name"]! }
         )
 
         return result
@@ -162,7 +162,9 @@ class DataModel {
     var count: Int { return self.asArray().filter { $0["id"]! != myId }.count }
 
     subscript(index: Int) -> SolarFlare {
-        let array = self.asArray().filter { $0["id"] != myId }
+        let array = self.asArray()
+            .filter { $0["id"] != myId }
+
         return array[index]
     }
 
@@ -191,6 +193,9 @@ func dataToArray(_ data: Data) -> [[String: Any]]? {
     if let json = try? JSONSerialization.jsonObject(with: data, options: [])  {
         if let json = json as? [[String: Any]] {
             return json
+        }
+        if let json = json as? [String: Any] {
+            return [json]
         }
     }
     return nil
