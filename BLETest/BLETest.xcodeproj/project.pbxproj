@@ -10,7 +10,6 @@
 		2B0D99791DDFB4460008F57C /* BluetoothKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2B7180881DDFB41600569235 /* BluetoothKit.framework */; };
 		2B0D997A1DDFB4500008F57C /* BluetoothKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 2B7180881DDFB41600569235 /* BluetoothKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		2B0D997C1DDFB7790008F57C /* DataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B0D997B1DDFB7790008F57C /* DataModel.swift */; };
-		2B0D997E1DDFBDBC0008F57C /* JSONConversion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B0D997D1DDFBDBC0008F57C /* JSONConversion.swift */; };
 		2B269B681DDE2F40004CD67C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B269B671DDE2F40004CD67C /* AppDelegate.swift */; };
 		2B269B6A1DDE2F40004CD67C /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B269B691DDE2F40004CD67C /* ViewController.swift */; };
 		2B269B6D1DDE2F40004CD67C /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2B269B6B1DDE2F40004CD67C /* Main.storyboard */; };
@@ -18,6 +17,7 @@
 		2B269B721DDE2F40004CD67C /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2B269B701DDE2F40004CD67C /* LaunchScreen.storyboard */; };
 		2B269B7D1DDE2F40004CD67C /* BLETestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B269B7C1DDE2F40004CD67C /* BLETestTests.swift */; };
 		2B269B881DDE2F40004CD67C /* BLETestUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B269B871DDE2F40004CD67C /* BLETestUITests.swift */; };
+		2B7F86641DE1603300E32C84 /* Data+Compressor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B7F86631DE1603300E32C84 /* Data+Compressor.swift */; };
 		2BB97A061DE0F8460041AA35 /* FlareTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BB97A051DE0F8460041AA35 /* FlareTableViewCell.swift */; };
 /* End PBXBuildFile section */
 
@@ -75,7 +75,6 @@
 
 /* Begin PBXFileReference section */
 		2B0D997B1DDFB7790008F57C /* DataModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataModel.swift; sourceTree = "<group>"; };
-		2B0D997D1DDFBDBC0008F57C /* JSONConversion.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSONConversion.swift; sourceTree = "<group>"; };
 		2B269B641DDE2F40004CD67C /* BLETest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BLETest.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2B269B671DDE2F40004CD67C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		2B269B691DDE2F40004CD67C /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -90,6 +89,7 @@
 		2B269B871DDE2F40004CD67C /* BLETestUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLETestUITests.swift; sourceTree = "<group>"; };
 		2B269B891DDE2F40004CD67C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2B7180811DDFB41600569235 /* BluetoothKit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = BluetoothKit.xcodeproj; path = ../Carthage/Checkouts/BluetoothKit/BluetoothKit.xcodeproj; sourceTree = "<group>"; };
+		2B7F86631DE1603300E32C84 /* Data+Compressor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Data+Compressor.swift"; sourceTree = "<group>"; };
 		2BB97A051DE0F8460041AA35 /* FlareTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlareTableViewCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -150,8 +150,8 @@
 				2B269B701DDE2F40004CD67C /* LaunchScreen.storyboard */,
 				2B269B731DDE2F40004CD67C /* Info.plist */,
 				2B0D997B1DDFB7790008F57C /* DataModel.swift */,
-				2B0D997D1DDFBDBC0008F57C /* JSONConversion.swift */,
 				2BB97A051DE0F8460041AA35 /* FlareTableViewCell.swift */,
+				2B7F86631DE1603300E32C84 /* Data+Compressor.swift */,
 			);
 			path = BLETest;
 			sourceTree = "<group>";
@@ -359,10 +359,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				2B269B6A1DDE2F40004CD67C /* ViewController.swift in Sources */,
+				2B7F86641DE1603300E32C84 /* Data+Compressor.swift in Sources */,
 				2BB97A061DE0F8460041AA35 /* FlareTableViewCell.swift in Sources */,
 				2B269B681DDE2F40004CD67C /* AppDelegate.swift in Sources */,
 				2B0D997C1DDFB7790008F57C /* DataModel.swift in Sources */,
-				2B0D997E1DDFBDBC0008F57C /* JSONConversion.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

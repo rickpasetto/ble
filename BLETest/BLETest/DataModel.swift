@@ -91,7 +91,7 @@ class DataModel {
 
     init() {
         // Happy Birthday
-        self.add(["birthday": Date().asString(),
+        self.add([//"birthday": Date().asString(),
                   "id": myId,
                   "bluetoothId": "",
                   "name": myName,
@@ -130,6 +130,17 @@ class DataModel {
 
     func associate(id: Id, bluetoothId: UUID) {
         items[id]?["bluetoothId"] = bluetoothId.uuidString
+    }
+
+    func associatedId(bluetoothId: UUID) -> String? {
+
+        for (_, value) in items {
+
+            if value["bluetoothId"] == bluetoothId.uuidString {
+                return value["id"]
+            }
+        }
+        return nil
     }
 
     func add(_ item: SolarFlare) {
@@ -190,7 +201,7 @@ class DataModel {
 }
 
 func dataToArray(_ data: Data) -> [[String: Any]]? {
-    if let json = try? JSONSerialization.jsonObject(with: data, options: [])  {
+    if let json = try? JSONSerialization.jsonObject(with: data, options: .allowFragments)  {
         if let json = json as? [[String: Any]] {
             return json
         }
@@ -198,5 +209,6 @@ func dataToArray(_ data: Data) -> [[String: Any]]? {
             return [json]
         }
     }
+    print("\n********\nCOULD NOT PARSE DATA!\n\(String(data: data, encoding: .utf8))\n********\n")
     return nil
 }

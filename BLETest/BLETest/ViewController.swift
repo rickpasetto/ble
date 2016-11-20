@@ -16,6 +16,9 @@ BKRemotePeripheralDelegate, BKPeripheralDelegate, BKRemotePeerDelegate, BKAvaila
 
     let TimeoutToCentral = 5 // secs
     let TimeoutToPeripheral = 5 // secs
+    let AckTimeout = 4 // secs
+
+    var acksWaiting: [UUID : Timer] = [:]
 
     @IBOutlet weak var deviceName: UITextField!
     @IBOutlet weak var status: UISwitch!
@@ -156,7 +159,7 @@ BKRemotePeripheralDelegate, BKPeripheralDelegate, BKRemotePeerDelegate, BKAvaila
             for discovery in discoveries {
                 self.central.connect(remotePeripheral: discovery.remotePeripheral) { remotePeripheral, error in
 //                    print("Connected to \(remotePeripheral.name)")
-                    self.timer?.invalidate()
+//                    self.timer?.invalidate()
                     remotePeripheral.delegate = self
                     remotePeripheral.peripheralDelegate = self
                 }
@@ -225,13 +228,19 @@ BKRemotePeripheralDelegate, BKPeripheralDelegate, BKRemotePeerDelegate, BKAvaila
     // MARK: BKRemotePeerDelegate
 
     func remotePeer(_ remotePeer: BKRemotePeer, didSendArbitraryData data: Data) {
-//        print("Received data of length: \(data.count) with hash: \(data.hashValue)")
 
-        print("Received data: " + debugDataStr(data))
-
-        self.model.mergeWith(data: data, clearFirst: !isCentral())
+        if isCentral() && String(data: data, encoding: .utf8) == "ACK" {
+            print("GOT ACK from \(self.model.associatedId(bluetoothId: remotePeer.identifier))")
+            acksWaiting[remotePeer.identifier]?.invalidate()
+            acksWaiting[remotePeer.identifier] = nil
+            return
+        }
 
         if let array = dataToArray(data) {
+            print("Received data \(data): " + debugDataStr(data))
+
+            self.model.mergeWith(data: data, clearFirst: !isCentral())
+
             let other = array[0]
             print("Peer: \(other): bluetoothId: \(remotePeer.identifier)")
             self.model.associate(id: other["id"]! as! Id, bluetoothId: remotePeer.identifier)
@@ -240,6 +249,10 @@ BKRemotePeripheralDelegate, BKPeripheralDelegate, BKRemotePeerDelegate, BKAvaila
 
             if isCentral() {
                 sendUpdate()
+            } else {
+                self.peripheral?.sendData("ACK".data(using: .utf8)!, toRemotePeer: remotePeer) { _ in
+                    print("SENT ACK")
+                }
             }
         }
     }
@@ -254,7 +267,7 @@ BKRemotePeripheralDelegate, BKPeripheralDelegate, BKRemotePeerDelegate, BKAvaila
     }
 
     public func central(_ central: BKCentral, remotePeripheralDidConnect remotePeripheral: BKRemotePeripheral) {
-        print("Remote peripheral did connect: \(remotePeripheral)")
+        print("Remote peripheral did connect: \(remotePeripheral.name!) (\(remotePeripheral.identifier.uuidString))")
     }
 
     
@@ -280,6 +293,7 @@ BKRemotePeripheralDelegate, BKPeripheralDelegate, BKRemotePeerDelegate, BKAvaila
 
     private func broadcastUpdateTo(from: BKPeer, to: [BKRemotePeer]) {
         if let data = model.toJSON() {
+
             for remote in to {
 
                 from.sendData(data, toRemotePeer: remote) { data, remote, error in
@@ -287,7 +301,23 @@ BKRemotePeripheralDelegate, BKPeripheralDelegate, BKRemotePeerDelegate, BKAvaila
                         print("Failed sending to \(remote)")
                         return
                     }
-                    print("Sent data: \(self.debugDataStr(data)) to \(remote)")
+                    print("Sent data: \(self.debugDataStr(data)) to \(self.model.associatedId(bluetoothId: remote.identifier))")
+
+                    if self.isCentral() {
+                        if #available(iOS 10.0, *) {
+                            self.acksWaiting[remote.identifier] = Timer.scheduledTimer(
+                                withTimeInterval: TimeInterval(self.AckTimeout),
+                                repeats: true, block: { _ in
+                                    if self.acksWaiting[remote.identifier] != nil {
+                                        print("TRYING AGAIN to \(self.model.associatedId(bluetoothId: remote.identifier))")
+                                        self.central.sendData(data, toRemotePeer: remote, completionHandler: nil)
+                                    }
+                            })
+                        } else {
+                            // Fallback on earlier versions
+                        }
+
+                    }
                 }
             }
         }
@@ -334,7 +364,7 @@ BKRemotePeripheralDelegate, BKPeripheralDelegate, BKRemotePeerDelegate, BKAvaila
      */
     public func remotePeripheralIsReady(_ remotePeripheral: BKRemotePeripheral) {
 
-        print("Remote peripheral is ready: \(remotePeripheral)")
+        print("Remote peripheral is ready: \(remotePeripheral.name!) (\(remotePeripheral.identifier.uuidString))")
         sendUpdate()
     }
 
