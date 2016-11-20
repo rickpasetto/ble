@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 //struct SolarFlare: JSONSerializable {
 //    let birthday: Date
@@ -83,12 +84,17 @@ class DataModel {
 
     fileprivate var items: [Id: SolarFlare] = [:]
 
+    fileprivate var myName: String {
+//        return "Flare-" + myId.substring(to: myId.index(myId.startIndex, offsetBy: 4))
+        return UIDevice.current.name
+    }
+
     init() {
         // Happy Birthday
         self.add(["birthday": Date().asString(),
                   "id": myId,
                   "bluetoothId": "",
-                  "name": "Flare-" + myId.substring(to: myId.index(myId.startIndex, offsetBy: 4)),
+                  "name": myName,
                   "status": "1",
                   "energyProduced": "0.0"])
     }
