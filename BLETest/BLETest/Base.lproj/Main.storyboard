@@ -37,7 +37,7 @@
                                                         <nil key="textColor"/>
                                                         <nil key="highlightedColor"/>
                                                     </label>
-                                                    <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="NAME" borderStyle="roundedRect" textAlignment="natural" clearsOnBeginEditing="YES" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="jFi-6p-Hu8">
+                                                    <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="NAME" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="jFi-6p-Hu8">
                                                         <rect key="frame" x="111" y="0.0" width="155" height="30"/>
                                                         <nil key="textColor"/>
                                                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
@@ -151,7 +151,7 @@
                                                     <rect key="frame" x="0.0" y="0.0" width="296" height="44"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <subviews>
-                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="NAME0: " textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="10" adjustsLetterSpacingToFitWidth="YES" translatesAutoresizingMaskIntoConstraints="NO" id="y3P-vd-r0h">
+                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="250" text="NAME0: " textAlignment="natural" lineBreakMode="middleTruncation" baselineAdjustment="alignBaselines" adjustsLetterSpacingToFitWidth="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="y3P-vd-r0h">
                                                             <rect key="frame" x="8" y="11" width="131" height="21"/>
                                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                             <nil key="textColor"/>
@@ -175,7 +175,7 @@
                                                         <constraint firstItem="y3P-vd-r0h" firstAttribute="centerY" secondItem="jat-9G-elY" secondAttribute="centerY" id="dCS-tz-qg2"/>
                                                         <constraint firstAttribute="trailingMargin" secondItem="uYe-hk-eUK" secondAttribute="trailing" id="jQ8-Ox-cYy"/>
                                                         <constraint firstAttribute="trailingMargin" secondItem="jat-9G-elY" secondAttribute="trailing" constant="100" id="kfh-9x-Csz"/>
-                                                        <constraint firstItem="jat-9G-elY" firstAttribute="leading" secondItem="y3P-vd-r0h" secondAttribute="trailing" id="t7L-ef-6VV"/>
+                                                        <constraint firstItem="y3P-vd-r0h" firstAttribute="trailing" secondItem="jat-9G-elY" secondAttribute="leading" id="t7L-ef-6VV"/>
                                                     </constraints>
                                                 </tableViewCellContentView>
                                                 <connections>

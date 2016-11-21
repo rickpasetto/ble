@@ -104,7 +104,7 @@ internal class RemotePeripheralViewController: UIViewController, BKRemotePeriphe
     // MARK: Target Actions
 
     @objc fileprivate func sendData() {
-        let numberOfBytesToSend: Int = Int(arc4random_uniform(950) + 50)
+        let numberOfBytesToSend: Int = Int(arc4random_uniform(2050) + 50)
         let data = Data.dataWithNumberOfBytes(numberOfBytesToSend)
         Logger.log("Prepared \(numberOfBytesToSend) bytes with MD5 hash: \(data.md5().toHexString())")
         Logger.log("Sending to \(remotePeripheral)")

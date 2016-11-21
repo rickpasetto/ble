@@ -14,9 +14,14 @@ import BluetoothKit
 class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, BKCentralDelegate,
 BKRemotePeripheralDelegate, BKPeripheralDelegate, BKRemotePeerDelegate, BKAvailabilityObserver {
 
+    let UseAcks = false
+    let UseCompression = false
     let TimeoutToCentral = 5 // secs
     let TimeoutToPeripheral = 5 // secs
-    let AckTimeout = 4 // secs
+    let AckTimeout = 2 // secs
+    let SendRate = [ 0, 0, 0.25, 0.5, 2, 3.5, 5.0 ] // secs
+    let RepeatBroadcast = 0 // secs
+    var repeatBroadcastTimer : Timer?
 
     var acksWaiting: [UUID : Timer] = [:]
 
@@ -156,19 +161,26 @@ BKRemotePeripheralDelegate, BKPeripheralDelegate, BKRemotePeerDelegate, BKAvaila
 
 //            print("changes: \(changes), discoveries: \(discoveries)")
 //
-            for discovery in discoveries {
-                self.central.connect(remotePeripheral: discovery.remotePeripheral) { remotePeripheral, error in
-//                    print("Connected to \(remotePeripheral.name)")
-//                    self.timer?.invalidate()
-                    remotePeripheral.delegate = self
-                    remotePeripheral.peripheralDelegate = self
-                }
-            }
+//            for discovery in discoveries {
+//                self.central.connect(remotePeripheral: discovery.remotePeripheral) { remotePeripheral, error in
+////                    print("Connected to \(remotePeripheral.name)")
+////                    self.timer?.invalidate()
+//                    remotePeripheral.delegate = self
+//                    remotePeripheral.peripheralDelegate = self
+//                }
+//            }
             self.discoveries = discoveries
 
+//            var lostOne = false
 //            for lost in changes.filter({ $0 == .remove(discovery: nil) }) {
-//                print("Lost \(lost.discovery.localName)!")
-//                self.model.remove( id: lost.discovery.remotePeripheral.identifier.uuidString )
+//                print("Lost \(lost.discovery.remotePeripheral.identifier)!")
+//                self.model.remove( id: lost.discovery.remotePeripheral.identifier )
+//                lostOne = true
+//            }
+//
+//            if lostOne {
+//                self.updateUI()
+//                self.sendUpdate()
 //            }
 
 //            let indexPathsToRemove = changes.filter({ $0 == .remove(discovery: nil) }).map({ IndexPath(row: self.discoveries.index(of: $0.discovery)!, section: 0) })
@@ -179,19 +191,22 @@ BKRemotePeripheralDelegate, BKPeripheralDelegate, BKRemotePeerDelegate, BKAvaila
 //            if !indexPathsToInsert.isEmpty {
 //                self.itemsTableView.insertRows(at: indexPathsToInsert, with: UITableViewRowAnimation.automatic)
 //            }
-//            for insertedDiscovery in changes.filter({ $0 == .insert(discovery: nil) }) {
-//                print("Discovery: \(insertedDiscovery)")
-//            }
+            for insertedDiscovery in changes.filter({ $0 == .insert(discovery: nil) }) {
+                print("New Discovery: \(insertedDiscovery)")
+                self.central.connect(remotePeripheral: insertedDiscovery.discovery.remotePeripheral) { remotePeripheral, error in
+                    print("Connected to \(remotePeripheral.name)")
+                    remotePeripheral.delegate = self
+                    remotePeripheral.peripheralDelegate = self
+                }
+            }
 
         }, stateHandler: { newState in
             if newState == .scanning {
-//                self.activityIndicator?.startAnimating()
                 return
             } else if newState == .stopped {
 //                self.discoveries.removeAll()
 //                self.discoveriesTableView.reloadData()
             }
-//            self.activityIndicator?.stopAnimating()
         }, errorHandler: { error in
 //            print("Error from scanning: \(error)")
         })
@@ -229,29 +244,32 @@ BKRemotePeripheralDelegate, BKPeripheralDelegate, BKRemotePeerDelegate, BKAvaila
 
     func remotePeer(_ remotePeer: BKRemotePeer, didSendArbitraryData data: Data) {
 
-        if isCentral() && String(data: data, encoding: .utf8) == "ACK" {
-            print("GOT ACK from \(self.model.associatedId(bluetoothId: remotePeer.identifier))")
+        if self.UseAcks && isCentral() && String(data: data, encoding: .utf8) == "ACK" {
+            print("GOT ACK from \(self.model.associatedName(bluetoothId: remotePeer.identifier))")
             acksWaiting[remotePeer.identifier]?.invalidate()
             acksWaiting[remotePeer.identifier] = nil
             return
         }
+        synchronize(self) {
+            let data = UseCompression ? data.uncompressed : data
 
-        if let array = dataToArray(data) {
-            print("Received data \(data): " + debugDataStr(data))
+            if let array = dataToArray(data) {
+                print("Received data \(data): " + debugDataStr(data))
 
-            self.model.mergeWith(data: data, clearFirst: !isCentral())
+                self.model.mergeWith(data: data, clearFirst: !isCentral())
 
-            let other = array[0]
-            print("Peer: \(other): bluetoothId: \(remotePeer.identifier)")
-            self.model.associate(id: other["id"]! as! Id, bluetoothId: remotePeer.identifier)
+                let other = array[0]
+                print("Peer: \(other): bluetoothId: \(remotePeer.identifier)")
+                self.model.associate(id: other["id"]! as! Id, bluetoothId: remotePeer.identifier)
 
-            self.updateUI()
+                self.updateUI()
 
-            if isCentral() {
-                sendUpdate()
-            } else {
-                self.peripheral?.sendData("ACK".data(using: .utf8)!, toRemotePeer: remotePeer) { _ in
-                    print("SENT ACK")
+                if isCentral() {
+                    sendUpdate()
+                } else if self.UseAcks {
+                    self.peripheral?.sendData("ACK".data(using: .utf8)!, toRemotePeer: remotePeer) { _ in
+                        print("SENT ACK")
+                    }
                 }
             }
         }
@@ -268,6 +286,7 @@ BKRemotePeripheralDelegate, BKPeripheralDelegate, BKRemotePeerDelegate, BKAvaila
 
     public func central(_ central: BKCentral, remotePeripheralDidConnect remotePeripheral: BKRemotePeripheral) {
         print("Remote peripheral did connect: \(remotePeripheral.name!) (\(remotePeripheral.identifier.uuidString))")
+
     }
 
     
@@ -285,48 +304,93 @@ BKRemotePeripheralDelegate, BKPeripheralDelegate, BKRemotePeerDelegate, BKAvaila
 
     private func sendUpdate() {
         if let peripheral = peripheral {
-            broadcastUpdateTo(from: peripheral, to: peripheral.connectedRemoteCentrals)
+            broadcastUpdateTo(from: peripheral, toRemotes: peripheral.connectedRemoteCentrals)
         } else {
-            broadcastUpdateTo(from: central, to: central.connectedRemotePeripherals)
+            broadcastUpdateTo(from: central, toRemotes: central.connectedRemotePeripherals)
         }
     }
 
-    private func broadcastUpdateTo(from: BKPeer, to: [BKRemotePeer]) {
+    private func broadcastUpdateTo(from: BKPeer, toRemotes: [BKRemotePeer]) {
         if let data = model.toJSON() {
 
-            for remote in to {
+//            for remote in toRemotes {
+//                if #available(iOS 10.0, *), sendRate(toRemotes.count) > 0 {
+//                    Timer.scheduledTimer(withTimeInterval: TimeInterval(sendRate(toRemotes.count)), repeats: false) { _ in
+//                        self.sendData(data: data, from: from, remote: remote)
+//                    }
+//                } else {
+//                    self.sendData(data: data, from: from, remote: remote)
+//                }
+//            }
+            sendDataQueued(data: data, from: from, toRemotes: toRemotes, rate: self.sendRate(toRemotes.count))
+        }
+    }
 
-                from.sendData(data, toRemotePeer: remote) { data, remote, error in
-                    guard error == nil else {
-                        print("Failed sending to \(remote)")
-                        return
-                    }
-                    print("Sent data: \(self.debugDataStr(data)) to \(self.model.associatedId(bluetoothId: remote.identifier))")
+    private func sendDataQueued(data: Data, from: BKPeer, toRemotes: [BKRemotePeer], rate: TimeInterval) {
 
-                    if self.isCentral() {
-                        if #available(iOS 10.0, *) {
-                            self.acksWaiting[remote.identifier] = Timer.scheduledTimer(
-                                withTimeInterval: TimeInterval(self.AckTimeout),
-                                repeats: true, block: { _ in
-                                    if self.acksWaiting[remote.identifier] != nil {
-                                        print("TRYING AGAIN to \(self.model.associatedId(bluetoothId: remote.identifier))")
-                                        self.central.sendData(data, toRemotePeer: remote, completionHandler: nil)
-                                    }
-                            })
-                        } else {
-                            // Fallback on earlier versions
+        var toRemotesCopy = toRemotes
+
+        if let remote = toRemotesCopy.popLast() {
+            self.sendData(data: data, from: from, remote: remote) { success in
+                if success {
+                    if #available(iOS 10.0, *), rate > 0 {
+                        Timer.scheduledTimer(withTimeInterval: rate, repeats: false) { _ in
+                            self.sendDataQueued(data: data, from: from, toRemotes: toRemotesCopy, rate: rate)
                         }
-
+                    } else {
+                        self.sendDataQueued(data: data, from: from, toRemotes: toRemotesCopy, rate: rate)
                     }
                 }
             }
         }
     }
 
-    private func debugDataStr(_ data: Data) -> String {
-//        return String(data: data, encoding: .utf8)
+    private func sendRate(_ count: Int) -> Double {
+        return SendRate[min(count, SendRate.count - 1)]
 
-        return "\(dataToArray(data))"
+        // y = 0.325 - 0.35625*x + 0.1294643*x^2
+        // y = 0.005952381 - 0.3154762*x + 0.3854167*x^2 - 0.1041667*x^3 + 0.01041667*x^4
+//        let x = Double(count)
+//        let y = 0.005952381 - 0.3154762*x + 0.3854167*x*x - 0.1041667*x*x*x + 0.01041667*x*x*x*x
+//
+//        print("Using send rate \(y)")
+//        return y
+    }
+
+    private func sendData(data: Data, from: BKPeer, remote: BKRemotePeer, completion: ((_ success: Bool) -> Void)?) {
+        from.sendData(UseCompression ? data.compressed : data, toRemotePeer: remote) { ndata, remote, error in
+            guard error == nil else {
+                print("Failed sending to \(remote)")
+                completion?(false)
+                return
+            }
+            print("Sent data: \(self.debugDataStr(data)) to \(self.model.associatedName(bluetoothId: remote.identifier))")
+
+            if self.UseAcks {
+                if #available(iOS 10.0, *) {
+                    if self.isCentral() {
+                        self.acksWaiting[remote.identifier] = Timer.scheduledTimer(
+                            withTimeInterval: TimeInterval(self.AckTimeout),
+                            repeats: true, block: { _ in
+                                if self.acksWaiting[remote.identifier] != nil {
+                                    print("TRYING AGAIN to \(self.model.associatedName(bluetoothId: remote.identifier))")
+                                    self.sendData(data: data, from: self.central, remote: remote, completion: nil)
+                                }
+                        })
+                    } else {
+                        // Fallback on earlier versions
+                    }
+                }
+            }
+            completion?(true)
+        }
+
+    }
+
+    private func debugDataStr(_ data: Data) -> String {
+        return String(data: data, encoding: .utf8)!
+
+//        return "\(dataToArray(data))"
     }
 
     /**
@@ -365,6 +429,12 @@ BKRemotePeripheralDelegate, BKPeripheralDelegate, BKRemotePeerDelegate, BKAvaila
     public func remotePeripheralIsReady(_ remotePeripheral: BKRemotePeripheral) {
 
         print("Remote peripheral is ready: \(remotePeripheral.name!) (\(remotePeripheral.identifier.uuidString))")
+
+        if #available(iOS 10.0, *), RepeatBroadcast > 0, isCentral(), repeatBroadcastTimer == nil {
+            repeatBroadcastTimer = Timer.scheduledTimer(withTimeInterval: TimeInterval(RepeatBroadcast), repeats: true) { _ in
+                self.sendUpdate()
+            }
+        }
         sendUpdate()
     }
 

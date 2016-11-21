@@ -10,11 +10,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "BLETest/ViewController.swift"
-            timestampString = "501310021.858475"
+            timestampString = "501388024.90879"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "276"
-            endingLineNumber = "276"
+            startingLineNumber = "295"
+            endingLineNumber = "295"
             landmarkName = "central(_:remotePeripheralDidDisconnect:)"
             landmarkType = "7">
             <Actions>
@@ -34,11 +34,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "BLETest/ViewController.swift"
-            timestampString = "501310021.858475"
+            timestampString = "501388024.90879"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "240"
-            endingLineNumber = "240"
+            startingLineNumber = "257"
+            endingLineNumber = "257"
             landmarkName = "remotePeer(_:didSendArbitraryData:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -50,11 +50,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "Yes"
             filePath = "BLETest/DataModel.swift"
-            timestampString = "501303486.446641"
+            timestampString = "501385440.777849"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "213"
-            endingLineNumber = "213"
+            startingLineNumber = "242"
+            endingLineNumber = "242"
             landmarkName = "dataToArray(_:)"
             landmarkType = "9">
             <Actions>
@@ -65,6 +65,77 @@
                   </ActionContent>
                </BreakpointActionProxy>
             </Actions>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "Yes"
+            filePath = "BLETest/ViewController.swift"
+            timestampString = "501387218.955734"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "176"
+            endingLineNumber = "176"
+            landmarkName = "scan()"
+            landmarkType = "7">
+            <Actions>
+               <BreakpointActionProxy
+                  ActionExtensionID = "Xcode.BreakpointAction.Sound">
+                  <ActionContent
+                     soundName = "Pop">
+                  </ActionContent>
+               </BreakpointActionProxy>
+            </Actions>
+            <Locations>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "BLETest.ViewController.(scan in _DB3CD63E6D1C211A95E16A6578875332) () -&gt; ()"
+                  moduleName = "BLETest"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/rpasetto/code/ble/BLETest/BLETest/ViewController.swift"
+                  timestampString = "501387693.105537"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "198"
+                  endingLineNumber = "198"
+                  offsetFromSymbolStart = "188">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "BLETest.ViewController.((scan in _DB3CD63E6D1C211A95E16A6578875332) () -&gt; ()).(closure #1)"
+                  moduleName = "BLETest"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/rpasetto/code/ble/BLETest/BLETest/ViewController.swift"
+                  timestampString = "501387693.107219"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "198"
+                  endingLineNumber = "198"
+                  offsetFromSymbolStart = "500">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "BLETest.ViewController.((scan in _DB3CD63E6D1C211A95E16A6578875332) () -&gt; ()).(closure #2)"
+                  moduleName = "BLETest"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/rpasetto/code/ble/BLETest/BLETest/ViewController.swift"
+                  timestampString = "501387693.10872"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "199"
+                  endingLineNumber = "199"
+                  offsetFromSymbolStart = "20">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>
